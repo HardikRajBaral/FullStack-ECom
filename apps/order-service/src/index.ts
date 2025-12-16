@@ -2,6 +2,15 @@ import Fastify from 'fastify';
 
 const fastify =Fastify();
 
+
+fastify.get('/health',async (request,reply)=>{
+    return reply.status(200).send({
+        status:"ok",
+        upTime: process.uptime(),
+        timeStamp:Date.now()
+    }) 
+}
+);
 const start = async () => {
     try{
         fastify.listen({port : 8001})
