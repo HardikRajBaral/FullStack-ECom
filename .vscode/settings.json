@@ -4,4 +4,8 @@
       "mode": "auto"
     }
   ]
+  ,"files.associations": {
+    "*.prisma": "prisma"
+  },
+  "prisma.pinToPrisma6": true
 }
