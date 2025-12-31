@@ -17,10 +17,10 @@ const products: ProductsType = [
     sizes: ["s", "m", "l", "xl", "xxl"],
     colors: ["gray", "purple", "green"],
     images: {
-      gray: "/products/1g.png",
-      purple: "/products/1p.png",
-      green: "/products/1gr.png",
-    },
+      "gray": "/products/1g.png",
+      "purple": "/products/1p.png",
+      "green": "/products/1gr.png",
+    }, 
   },
   {
     id: 2,
