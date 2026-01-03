@@ -8,7 +8,7 @@ export const orderRoute= async (fastify:FastifyInstance)=>{
         return reply.send(orders);
     })
 
-    fastify.get('/orders',async(request,reply)=>{
+    fastify.get('/orders',{preHandler:shouldBeUser},async(request,reply)=>{
         const orders= await Order.find();
         return reply.send(orders);
     })
