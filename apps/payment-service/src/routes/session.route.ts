@@ -19,8 +19,10 @@ sessionRoute.post("/create-checkout-session",shouldBeUser, async (c) => {
       },
     ],
     mode: 'payment',
-    return_url: `http://localhost:5173/complete.html?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `http://localhost:3002/complete.html?session_id={CHECKOUT_SESSION_ID}`,
   });
 
   c.json({ clientSecret: session.client_secret });
 });
+
+export default sessionRoute
