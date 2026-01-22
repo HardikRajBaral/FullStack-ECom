@@ -1,9 +1,11 @@
 "use client"
 
 import { useAuth } from "@clerk/nextjs";
+import { ShippingFormInputs } from "@repo/types";
 import { CheckoutProvider } from "@stripe/react-stripe-js/checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
+import CheckoutForm from "./CheckoutForm";
 const stripe = loadStripe("pk_test_51SlWVHLcGyPLZMruRgmp8NtwjRHsI5mtmv71IpIi7FnVeoJXeaNlvDuJULnd6wlvnheRI7GdpyI7Ea4sYAG4MqZY00pCsbUXkx");
 
 
@@ -16,7 +18,7 @@ const fetchClientSecret = async (token:String) => {
   }
 
 
-const StripePaymentForm=()=>{
+const StripePaymentForm=({shippingForm}:{shippingForm:ShippingFormInputs})=>{
     const[token,setToken]= useState<string | null>(null)
     const {getToken}= useAuth()
 
@@ -35,7 +37,7 @@ const StripePaymentForm=()=>{
            fetchClientSecret:()=>fetchClientSecret(token)
           }}
         >
-        
+        <CheckoutForm shippingForm={shippingForm}/>
         </CheckoutProvider>
     
     )
