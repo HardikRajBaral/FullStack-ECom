@@ -2,7 +2,7 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { ShippingFormInputs } from "@repo/types";
-import { CheckoutProvider } from "@stripe/react-stripe-js/checkout";
+import { CheckoutProvider } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import CheckoutForm from "./CheckoutForm";
