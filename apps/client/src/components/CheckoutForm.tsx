@@ -21,7 +21,11 @@ const CheckoutForm=({shippingForm}:{shippingForm:ShippingFormInputs})=>{
                 country:"US"
             }
         })
-
+        const res= await checkout.confirm()
+        if(res.type==='error'){
+            setError(res.error)
+        }
+        setLoading(false)
        
     }
 
@@ -29,8 +33,9 @@ const CheckoutForm=({shippingForm}:{shippingForm:ShippingFormInputs})=>{
         <form>
             <PaymentElement options={{layout:'accordion'}}/>
             <button disabled={loading} onClick={handleClick}>
-                Pay
+               {loading? "Loading... ":"Pay"}
             </button>
+            {error && <div>{error.message}</div>}
 
         </form>
     )

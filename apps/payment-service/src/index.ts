@@ -22,7 +22,7 @@ app.get('/health', (c) => {
 })
 
 
-app.route("/session",sessionRoute)
+app.route("/sessions",sessionRoute)
 
 
 
