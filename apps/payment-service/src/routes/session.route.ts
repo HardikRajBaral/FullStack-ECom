@@ -1,30 +1,41 @@
 import { Hono } from "hono";
 import stripe from "../utils/stripe";
 import { shouldBeUser } from "../middleware/authMiddleware";
+import { CartItemsType } from "@repo/types";
+import { getStripeProductPrice } from "../utils/srtipeProduct";
 
 const sessionRoute=new Hono()
 
 sessionRoute.post("/create-checkout-session",shouldBeUser, async (c) => {
-  try {
-    
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
+  const {cart}:{cart:CartItemsType}= await c.req.json();
+  const user = c.get("userId");
+  
+  const lineItems=await Promise.all(
+    cart.map(async (item)=>{
+      const unitAmount= await getStripeProductPrice(item.id);
+      return{
         price_data:{
           currency:"usd",
           product_data:{
-            name:"Test Product"
+            name:item.name
           },
-          unit_amount:2000,
+          unit_amount:unitAmount as number,
         },
-        quantity: 1,
-      },
-    ],
+        quantity: item.quantity,
+      }
+    })
+  )
+  try {
+    
+    const session = await stripe.checkout.sessions.create({
+      line_items: lineItems,
+      client_reference_id:user,
     mode: 'payment',
+    ui_mode:"custom",
     return_url: `http://localhost:3002/complete.html?session_id={CHECKOUT_SESSION_ID}`,
   });
 
-  c.json({ clientSecret: session.client_secret });
+  return c.json({ checkoutSessionClientSecrete: session.client_secret });
 } catch (error) {
   console.log(error)
   return c.json({ error })

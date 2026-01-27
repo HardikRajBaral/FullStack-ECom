@@ -32,7 +32,7 @@ const CheckoutForm=({shippingForm}:{shippingForm:ShippingFormInputs})=>{
     return(
         <form>
             <PaymentElement options={{layout:'accordion'}}/>
-            <button disabled={loading} onClick={handleClick}>
+            <button  disabled={loading || !checkout} onClick={handleClick}>
                {loading? "Loading... ":"Pay"}
             </button>
             {error && <div>{error.message}</div>}

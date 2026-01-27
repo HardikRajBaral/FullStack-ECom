@@ -39,7 +39,7 @@ const ShippingForm = ({
           id="name"
           placeholder="John Doe"
           {...register("name")}
-          value="Johon Doe"
+          value="John Doe"
         />
         {errors.name && (
           <p className="text-xs text-red-500">{errors.name.message}</p>
