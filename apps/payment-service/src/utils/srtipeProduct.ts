@@ -24,7 +24,7 @@ export const getStripeProductPrice=async(ProductId:number)=>{
     try {
       
          const res=await stripe.prices.list({
-            product:"123",
+            product:ProductId.toString(),
         })
   
         return res.data[0]?.unit_amount
