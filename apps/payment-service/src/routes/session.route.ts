@@ -35,7 +35,7 @@ sessionRoute.post("/create-checkout-session",shouldBeUser, async (c) => {
     return_url: `http://localhost:3002/complete.html?session_id={CHECKOUT_SESSION_ID}`,
   });
 
-  return c.json({ checkoutSessionClientSecrete: session.client_secret });
+  return c.json({ checkoutSessionClientSecret: session.client_secret });
 } catch (error) {
   console.log(error)
   return c.json({ error })
