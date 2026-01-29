@@ -1,7 +1,3 @@
-'use client'
-
-import React from 'react'
-
 const ReturnPage = async({searchParams}:{searchParams:Promise<{session_id:string}>| undefined})=>{
     const session_id=(await searchParams)?.session_id
 
