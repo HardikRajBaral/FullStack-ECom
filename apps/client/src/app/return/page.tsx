@@ -1,3 +1,5 @@
+import Link from "next/dist/client/link"
+
 const ReturnPage = async({searchParams}:{searchParams:Promise<{session_id:string}>| undefined})=>{
     const session_id=(await searchParams)?.session_id
 
@@ -10,8 +12,9 @@ const ReturnPage = async({searchParams}:{searchParams:Promise<{session_id:string
 
     return (
         <div>
-            <h1>Return Page</h1>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            <h1>Payment {data.status}</h1>
+            <p>Payment Status: {data.paymentStatus}</p>
+            <Link href="/orders">See your Orders</Link>
         </div>
     )
 }
