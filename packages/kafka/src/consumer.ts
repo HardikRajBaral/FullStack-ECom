@@ -1,6 +1,6 @@
 import type { Kafka, Consumer } from "kafkajs";
 
-export const  createconsumer=(kafka:Kafka,groupId:string)=>{
+export const  createConsumer=(kafka:Kafka,groupId:string)=>{
     const consumer :Consumer = kafka.consumer({groupId});
 
     const connect=async()=>{
