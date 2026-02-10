@@ -40,8 +40,13 @@ app.use((err:any,req:Request,res:Response,next:NextFunction)=>{
     })
 })
 
-app.listen(8000,()=>{
-    producer.connect()
-    consumer.connect()
-    console.log('Product service is running on port 8000');
-})
+const start = async()=>{
+    try{
+        Promise.all([await producer.connect(),await consumer.connect()])
+        app.listen(8000,()=>{
+            console.log("Product service is running on port 8000")
+        })
+    }catch(err){
+        console.log("Error starting the server",err)
+    }
+}
