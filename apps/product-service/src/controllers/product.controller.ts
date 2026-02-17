@@ -52,6 +52,7 @@ export const deleteProduct=async (req:Request,res:Response)=>{
             id:Number(id)
         }
     })
+    producer.send("product.deleted",{value:Number(id)})
     res.status(200).json(deletedProduct)
 };
 
