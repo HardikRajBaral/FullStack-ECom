@@ -50,3 +50,5 @@ const start = async()=>{
         console.log("Error starting the server",err)
     }
 }
+
+start()
