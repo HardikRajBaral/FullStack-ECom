@@ -51,7 +51,7 @@ app.route("/webhooks", webhookRoutes)
 
 const start=async ()=>{
   try{
-    Promise.all([,await producer.connect(),await consumer.connect()])
+    Promise.all([await producer.connect(),await consumer.connect()])
 
     serve({
       fetch: app.fetch,
