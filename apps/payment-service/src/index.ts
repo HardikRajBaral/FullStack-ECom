@@ -5,6 +5,7 @@ import sessionRoute from './routes/session.route.js'
 import { cors } from 'hono/cors'
 import webhookRoutes from './routes/webhooks.routs.js'
 import { consumer, producer } from './utils/kafka.js'
+import { runKafkaSubcriptions } from './utils/subcriptions.js'
 
 
 const app = new Hono()
@@ -52,7 +53,7 @@ app.route("/webhooks", webhookRoutes)
 const start=async ()=>{
   try{
     Promise.all([await producer.connect(),await consumer.connect()])
-
+    await runKafkaSubcriptions()
     serve({
       fetch: app.fetch,
       port: 8002
