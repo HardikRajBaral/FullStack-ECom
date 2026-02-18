@@ -1,4 +1,4 @@
-import { ProductsType } from "@repo/types";
+import { ProductType } from "@repo/types";
 import Categories from "./Categories";
 import ProductCard from "./ProductCard";
 import Link from "next/link";
@@ -144,11 +144,11 @@ import { ca } from "zod/locales";
 const fetchData = async({category,search,sort,params}:{category?:string,sort?:string,search?:string,params?:"homepage"|"products"})=>{
   const res= await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?${category ? `category=${category}` : ""}${search ? `&search=${search}` : ""}&sort=${sort|| "newest"}${params === "homepage" ? "&limit=8" : ""}`);
 
-  const data:ProductsType[]= await res.json()
+  const data:ProductType[]= await res.json()
   return data
 }
 
-const ProductList = async({ category,search,sort,params }: { category: string, search:string, sort:string, params:"homepage" | "products" }) => {
+const ProductList = async({ category,search,sort,params }: { category: string, search?:string, sort?:string, params:"homepage" | "products" }) => {
   const products =await fetchData({category ,search,sort ,params})
 
   return (
