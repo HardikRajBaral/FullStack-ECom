@@ -78,7 +78,7 @@ const AppSidebar = () => {
             <SidebarMenuButton asChild>
               <Link href="/">
                 <Image src="/logo.svg" alt="logo" width={20} height={20} />
-                <span>Lama Dev</span>
+                <span> Dev</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -163,7 +163,7 @@ const AppSidebar = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/users">
+                  <Link href="/orders">
                     <User />
                     See All Users
                   </Link>
