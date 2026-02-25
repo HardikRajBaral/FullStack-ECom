@@ -1,4 +1,3 @@
-
 import AppSidebar from "@/components/AppSidebar";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -17,7 +16,8 @@ export default async function RootLayout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
   
   return (
-        <ThemeProvider
+      <div className="flex">
+         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
@@ -31,5 +31,6 @@ export default async function RootLayout({
             </main>
           </SidebarProvider>
         </ThemeProvider>  
-  );
+      </div>
+  )
 }
