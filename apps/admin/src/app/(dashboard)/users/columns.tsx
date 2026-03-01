@@ -52,8 +52,8 @@ export const columns: ColumnDef<User>[] = [
       return (
         <div className="w-9 h-9 relative">
           <Image
-            src={user.avatar}
-            alt={user.fullName}
+            src={user.imageUrl}
+            alt={user.firstName|| user.username|| "-"}
             fill
             className="rounded-full object-cover"
           />
@@ -64,6 +64,10 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "fullName",
     header: "User",
+    cell:({row})=>{
+      const user=row.original
+      return <div>{user.firstName|| user.username|| "-"}</div>
+    }
   },
   {
     accessorKey: "email",
@@ -78,19 +82,24 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
+    cell:({row})=>{
+      const user=row.original
+      return <div>{user.emailAddresses[0]?.emailAddress}</div>
+    }
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const user= row.original
+      const status =user.banned?"Banned":"Active"
 
       return (
         <div
           className={cn(
             `p-1 rounded-md w-max text-xs`,
-            status === "active" && "bg-green-500/40",
-            status === "inactive" && "bg-red-500/40"
+            status === "Active" && "bg-green-500/40",
+            status === "Banned" && "bg-red-500/40"
           )}
         >
           {status as string}
