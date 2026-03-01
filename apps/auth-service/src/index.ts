@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { clerkMiddleware } from '@clerk/express'
 import { shouldBeAdmin } from './middleware/authMiddleware.js';
+import useRoutes from "./routes/user.route.js"
 
 const app =express();
 app.use(express.json())
@@ -22,7 +23,7 @@ app.get('/health',(req:Request,res:Response)=>{
 })
 
 
-app.use('/users',shouldBeAdmin)
+app.use('/users',shouldBeAdmin,useRoutes)
 
 app.use((err:any,req:Request,res:Response,next:NextFunction)=>{
     console.log(err)
