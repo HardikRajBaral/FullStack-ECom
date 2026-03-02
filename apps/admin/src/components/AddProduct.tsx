@@ -30,73 +30,47 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
+import { CategoryType, colors, ProductFormSchema, sizes } from "../../../../packages/types/src/product";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
-const categories = [
-  "T-shirts",
-  "Shoes",
-  "Accessories",
-  "Bags",
-  "Dresses",
-  "Jackets",
-  "Gloves",
-] as const;
-
-const colors = [
-  "blue",
-  "green",
-  "red",
-  "yellow",
-  "purple",
-  "orange",
-  "pink",
-  "brown",
-  "gray",
-  "black",
-  "white",
-] as const;
-
-const sizes = [
-  "xs",
-  "s",
-  "m",
-  "l",
-  "xl",
-  "xxl",
-  "34",
-  "35",
-  "36",
-  "37",
-  "38",
-  "39",
-  "40",
-  "41",
-  "42",
-  "43",
-  "44",
-  "45",
-  "46",
-  "47",
-  "48",
-] as const;
-
-const formSchema = z.object({
-  name: z.string().min(1, { message: "Product name is required!" }),
-  shortDescription: z
-    .string()
-    .min(1, { message: "Short description is required!" })
-    .max(60),
-  description: z.string().min(1, { message: "Description is required!" }),
-  price: z.number().min(1, { message: "Price is required!" }),
-  category: z.enum(categories),
-  sizes: z.array(z.enum(sizes)),
-  colors: z.array(z.enum(colors)),
-  images: z.record(z.enum(colors), z.string()),
-});
-
+// const categories = [
+//   "T-shirts",
+//   "Shoes",
+//   "Accessories",
+//   "Bags",
+//   "Dresses",
+//   "Jackets",
+//   "Gloves",
+// ] as const;
+const fetchCatogries=async () => {
+const res= await  fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`)
+  if(!res.ok){
+    throw new Error("Failed to fetch categories")
+  }
+  return await res.json()
+}
 const AddProduct = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof ProductFormSchema>>({
+    resolver: zodResolver(ProductFormSchema),
+    defaultValues:{
+      name: "",
+      shortDescription: "",
+      description: "",
+      price: 0,
+      categorySlug: "",
+      sizes: [],
+      colors: [],
+      images: {}
+    }
   });
+
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCatogries,
+  })
+ 
   return (
     <SheetContent>
       <ScrollArea className="h-screen">
@@ -169,9 +143,9 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
+              {data && <FormField
                   control={form.control}
-                  name="category"
+                  name="categorySlug"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
@@ -181,9 +155,9 @@ const AddProduct = () => {
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                           <SelectContent>
-                            {categories.map((cat) => (
-                              <SelectItem key={cat} value={cat}>
-                                {cat}
+                            {data.map((cat:CategoryType) => (
+                              <SelectItem key={cat.id} value={cat.Slug}>
+                                {cat.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -195,7 +169,7 @@ const AddProduct = () => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                />}
                 <FormField
                   control={form.control}
                   name="sizes"
@@ -275,21 +249,6 @@ const AddProduct = () => {
                               </div>
                             ))}
                           </div>
-                          {field.value && field.value.length > 0 && (
-                            <div className="mt-8 space-y-4">
-                              <p className="text-sm font-medium">Upload images for selected colors:</p>
-                              {field.value.map((color) => (
-                                <div className="flex items-center gap-2" key={color}>
-                                  <div
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: color }}
-                                  />
-                                  <span className="text-sm min-w-[60px]">{color}</span>
-                                  <Input type="file" accept="image/*" />
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </FormControl>
                       <FormDescription>
@@ -299,6 +258,58 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                control={form.control}
+                name="images"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Images</FormLabel>
+                    <FormControl>
+                      <div className=" ">
+                        {form.watch("colors")?.map((color)=>(
+                          <div className="mb-4 flex items-center gap-4 " key={color}> 
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }}/>
+                              <span className="text-sm font-medium min-w-[80px]">{color}:</span>
+                            </div>
+                            <Input
+                              type="file"
+                              accept="images/*"
+                              onChange={async(e)=>{
+                                const file= e.target.files?.[0]
+                                if(file){
+                                  try {
+                                    const formData= new FormData()
+                                    formData.append("file", file)
+                                    formData.append("upload_preset","E-com_web")
+                                    const res= await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLUDINARY_CLOUD_NAME}/image/upload`,{
+                                      method:"POST",
+                                      body:formData
+                                    })
+                                    const data= await res.json()
+                                    
+                                    if(data.secure_url){
+                                      const currentImages= form.getValues("images") || {}
+                                      form.setValue("images",{...currentImages,[color]:data.secure_url})
+                                    }
+
+                                  } catch (error) {
+                                    console.error("Error uploading image:", error);
+                                    toast.error("Failed to upload image. Please try again.");
+                                  }
+                                }
+                              }}
+                            />
+                            {field.value?.[color]?<span className="text-green-600 text-sm">Image selected</span>:<span className="text-red-600 text-sm">Image Requires</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+                />
+
+                
                 <Button type="submit">Submit</Button>
               </form>
             </Form>
