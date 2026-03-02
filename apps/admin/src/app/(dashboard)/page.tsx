@@ -10,7 +10,7 @@ const Homepage =async  () => {
   const token= await getToken()
   const orderChartData =fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`,{
     headers:{
-      Authentication:`Berear ${token}`
+      Authorization:`Bearer ${token}`
     }
   }).then(res=>res.json())
   return (

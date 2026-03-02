@@ -21,6 +21,9 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { CategoryFormSchema } from "@repo/types";
+import { useMutation } from "@tanstack/react-query";
+import { useAuth } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 
 
 
@@ -30,16 +33,43 @@ const AddCategory = () => {
     defaultValues:{
       name:"",
       slug:""
+    }
   }
+);
 
-  });
+const {getToken} = useAuth()
+
+const mutation = useMutation({
+    mutationFn: async(data:z.infer<typeof CategoryFormSchema>) => {
+      const token = await getToken()
+      const res=await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${token}`
+        },
+        body:JSON.stringify(data)
+      })
+      if(!res.ok){
+        throw new Error("Failed to add category")
+      }
+
+    },
+    onSuccess:()=>{
+      toast.success("Category added successfully")
+    },
+    onError:()=>{
+      toast.error("Failed to add category")
+    }
+  })
+
   return (
     <SheetContent>
       <SheetHeader>
         <SheetTitle className="mb-4">Add Category</SheetTitle>
         <SheetDescription asChild>
           <Form {...form}>
-            <form className="space-y-8">
+            <form className="space-y-8" onSubmit={form.handleSubmit(data=>mutation.mutate(data))}>
               <FormField
                 control={form.control}
                 name="name"
@@ -68,7 +98,7 @@ const AddCategory = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={mutation.isPending} className="disabled:opacity-50 disabled:cursor-not-allowed">{mutation.isPending?"Submitting...":"Submit"}</Button>
             </form>
           </Form>
         </SheetDescription>

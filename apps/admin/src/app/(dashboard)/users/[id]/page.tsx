@@ -30,7 +30,7 @@ const getData = async (id:string): Promise<User | null> => {
     const res= await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${id}`,
       {
         headers:{
-          Authentication:`Berear ${token}`
+          Authorization:`Bearer ${token}`
         }
       }
     )

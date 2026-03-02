@@ -10,7 +10,7 @@ const getData = async (): Promise<{data:User[]; totalCount:number}> => {
     const res= await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`,
       {
         headers:{
-          Authentication:`Berear ${token}`
+          Authorization:`Bearer ${token}`
         }
       }
     )

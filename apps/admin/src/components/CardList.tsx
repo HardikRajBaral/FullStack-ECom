@@ -135,7 +135,7 @@ const CardList =async ({ title }: { title: string }) => {
   }else{
     orders= await fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,{
       headers:{
-        Authentication:`Berear ${token}`
+        Authorization:`Bearer ${token}`
       }
     }).then(res=>res.json())
 
