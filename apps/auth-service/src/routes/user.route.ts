@@ -1,5 +1,6 @@
 import { Router }   from "express";
 import clerkClient from "../utils/clerk";
+import { producer } from "../utils/kafka";
 
 const router:Router=Router()
 
@@ -17,7 +18,12 @@ router.post("/",async(req,res)=>{
     type CreateParams= Parameters<typeof  clerkClient.users.createUser>[0]
     const newUser:CreateParams=req.body
     const user=await clerkClient.users.createUser(newUser)
-    res.status(200).json(user)
+    producer.send("user-created",{
+        value:{
+            userName:user.username,
+            email:user.emailAddresses[0]?.emailAddress
+        }
+    })
 })
 router.delete("/:id",async(req,res)=>{
     const {id} =req.params

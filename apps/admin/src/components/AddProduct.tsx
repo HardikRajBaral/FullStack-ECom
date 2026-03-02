@@ -31,8 +31,9 @@ import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
 import { CategoryType, colors, ProductFormSchema, sizes } from "../../../../packages/types/src/product";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useAuth } from "@clerk/nextjs";
 
 // const categories = [
 //   "T-shirts",
@@ -71,6 +72,33 @@ const AddProduct = () => {
     queryFn: fetchCatogries,
   })
  
+
+    const {getToken} = useAuth()
+    
+    const mutation = useMutation({
+        mutationFn: async(data:z.infer<typeof ProductFormSchema>) => {
+          const token = await getToken()
+          const res=await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`,{
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+              Authorization:`Bearer ${token}`
+            },
+            body:JSON.stringify(data)
+          })
+          if(!res.ok){
+            throw new Error("Failed to add product")
+          }
+    
+        },
+        onSuccess:()=>{
+          toast.success("Product added successfully")
+        },
+        onError:()=>{
+          toast.error("Failed to add product")
+        }
+      })
+    
   return (
     <SheetContent>
       <ScrollArea className="h-screen">
@@ -78,7 +106,7 @@ const AddProduct = () => {
           <SheetTitle className="mb-4">Add Product</SheetTitle>
           <SheetDescription asChild>
             <Form {...form}>
-              <form className="space-y-8">
+              <form className="space-y-8" onSubmit={form.handleSubmit(data=>mutation.mutate(data))}>
                 <FormField
                   control={form.control}
                   name="name"
@@ -134,7 +162,7 @@ const AddProduct = () => {
                     <FormItem>
                       <FormLabel>Price</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} onChange={e=>field.onChange(Number(e.target.value))}/>
                       </FormControl>
                       <FormDescription>
                         Enter the price of the product.
@@ -150,7 +178,7 @@ const AddProduct = () => {
                     <FormItem>
                       <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Select>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
@@ -310,7 +338,8 @@ const AddProduct = () => {
                 />
 
                 
-                <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={mutation.isPending} className="disabled:opacity-50 disabled:cursor-not-allowed">{mutation.isPending?"Submitting...":"Submit"}</Button>
+               
               </form>
             </Form>
           </SheetDescription>

@@ -3,6 +3,7 @@ import cors from 'cors';
 import { clerkMiddleware } from '@clerk/express'
 import { shouldBeAdmin } from './middleware/authMiddleware.js';
 import useRoutes from "./routes/user.route.js"
+import { producer } from './utils/kafka.js';
 
 const app =express();
 app.use(express.json())
@@ -35,7 +36,7 @@ app.use((err:any,req:Request,res:Response,next:NextFunction)=>{
 
 const start = async()=>{
     try{
-       
+        await producer.connect()
         app.listen(8003,()=>{
             console.log("auth service is running on port 8003")
         })
