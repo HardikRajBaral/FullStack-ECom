@@ -64,10 +64,10 @@ const AddUser = () => {
   
       },
       onSuccess:()=>{
-        toast.success("Category added successfully")
+        toast.success("User added successfully")
       },
       onError:()=>{
-        toast.error("Failed to add category")
+        toast.error("Failed to add user")
       }
     })
   
@@ -77,7 +77,7 @@ const AddUser = () => {
         <SheetTitle className="mb-4">Add User</SheetTitle>
         <SheetDescription asChild>
           <Form {...form}>
-            <form className="space-y-8">
+            <form className="space-y-8" onSubmit={form.handleSubmit(data=>mutation.mutate(data))}>
               <FormField
                 control={form.control}
                 name="firstName"
@@ -154,7 +154,7 @@ const AddUser = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} type="password" />
                     </FormControl>
                     <FormDescription>
                       Enter user password.
