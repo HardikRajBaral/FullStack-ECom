@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { shouldBeAdmin, shouldBeUser, } from "../middleware/authMiddleware";
 import { Order } from "@repo/order-db";
 import { startOfMonth, subMonths } from "date-fns";
+import { OrderChartType } from "@repo/types";
 
 export const orderRoute= async (fastify:FastifyInstance)=>{
     fastify.get('/user-orders',{preHandler:shouldBeUser},async(request,reply)=>{
@@ -10,7 +11,8 @@ export const orderRoute= async (fastify:FastifyInstance)=>{
     })
 
     fastify.get('/orders',{preHandler:shouldBeAdmin},async(request,reply)=>{
-        const orders= await Order.find();
+        const {limit}= request.query as {limit:number}
+        const orders= await Order.find().limit(limit).sort({createdAt:-1});
         return reply.send(orders);
     })
 
@@ -54,8 +56,34 @@ export const orderRoute= async (fastify:FastifyInstance)=>{
                 }
             }
         ])
+        const monthNames=[
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "Novemeber",
+            "December"
+        ]
+        const results:OrderChartType[]=[]
 
+        for(let i=5;i>=0;i--){
+            const d =subMonths(now,i)
+            const year=d.getFullYear()
+            const month=d.getMonth()+1
+
+            const match= raw.find((item)=>item.year===year && item.month===month)
+            results.push({
+                month:monthNames[month-1]as string,
+                total:match?match.total:0,
+                successful:match?match.successful:0
+            })
+            
+        }
     })
-    
-
 }

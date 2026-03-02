@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { OrderType, ProductsType } from "@repo/types";
+import { auth } from "@clerk/nextjs/server";
 
 const popularProducts = [
   {
@@ -120,20 +122,39 @@ const latestTransactions = [
   },
 ];
 
-const CardList = ({ title }: { title: string }) => {
+const CardList =async ({ title }: { title: string }) => {
+  const {getToken}=await auth()
+  const token= await getToken()
+
+  let products:ProductsType=[]
+  let orders:OrderType[]=[]
+
+
+  if(title==="Popular Produts"){
+    products= await fetch(`${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`).then(res=>res.json())
+  }else{
+    orders= await fetch(`${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,{
+      headers:{
+        Authentication:`Berear ${token}`
+      }
+    }).then(res=>res.json())
+
+  }
+
+
   return (
     <div className="">
       <h1 className="text-lg font-medium mb-6">{title}</h1>
       <div className="flex flex-col gap-2">
         {title === "Popular Products"
-          ? popularProducts.map((item) => (
+          ? products.map((item) => (
               <Card
                 key={item.id}
                 className="flex-row items-center justify-between gap-4 p-4"
               >
                 <div className="w-12 h-12 rounded-sm relative overflow-hidden">
                   <Image
-                    src={Object.values(item.images)[0] || ""}
+                    src={Object.values(item.images as Record<string,string>)[0] || ""}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -147,26 +168,19 @@ const CardList = ({ title }: { title: string }) => {
                 <CardFooter className="p-0">${item.price}K</CardFooter>
               </Card>
             ))
-          : latestTransactions.map((item) => (
+          : orders.map((item) => (
               <Card
-                key={item.id}
+                key={item._id}
                 className="flex-row items-center justify-between gap-4 p-4"
               >
-                <div className="w-12 h-12 rounded-sm relative overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+               
                 <CardContent className="flex-1 p-0">
                   <CardTitle className="text-sm font-medium">
-                    {item.title}
+                    {item.email}
                   </CardTitle>
-                  <Badge variant="secondary">{item.badge}</Badge>
+                  <Badge variant="secondary">{item.status}</Badge>
                 </CardContent>
-                <CardFooter className="p-0">${item.count /1000}K</CardFooter>
+                <CardFooter className="p-0">${item.amount /100}</CardFooter>
               </Card>
             ))}
       </div>
